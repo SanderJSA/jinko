@@ -13,11 +13,11 @@
 //!
 //! is the grammar for a variable assignment.
 
-use nom::{branch::alt, combinator::opt, multi::many0, IResult};
+use nom::{branch::alt, combinator::opt, combinator::peek, multi::many0, IResult};
 
 use crate::instruction::{
     Audit, Block, DecArg, FunctionCall, FunctionDec, FunctionKind, IfElse, Incl, Instruction,
-    JkInst, Loop, LoopKind, MethodCall, TypeDec, TypeInstantiation, Var, VarAssign,
+    JkInst, Loop, LoopKind, MethodCall, Return, TypeDec, TypeInstantiation, Var, VarAssign,
 };
 use crate::parser::{BoxConstruct, ConstantConstruct, ShuntingYard, Token};
 
@@ -52,6 +52,7 @@ impl Construct {
             BoxConstruct::block,
             BoxConstruct::var_assignment,
             BoxConstruct::variable,
+            BoxConstruct::return_expression,
             Construct::constant,
         ))(input)?;
 
@@ -755,6 +756,25 @@ impl Construct {
         let (input, method) = Construct::function_call(input)?;
 
         Ok((input, MethodCall::new(caller, method)))
+    }
+
+    pub fn return_expression(input: &str) -> ParseResult<Return> {
+        // println!("Return start");
+        let (input, _) = Token::return_tok(input)?;
+        // println!("Return tok -> {}", input);
+
+        let (input, _) = Token::maybe_consume_extra(input)?;
+        // println!("After white space -> {}", input);
+
+        let (input, ret_val) = opt(Construct::instruction)(input)?;
+        let (input, _) = Token::maybe_consume_extra(input)?;
+        println!("Input is \"{}\"", input);
+        if input != "" {
+            // There is still something
+            return Err(nom::Err::Error((input, nom::error::ErrorKind::NonEmpty)));
+        }
+
+        Ok((input, Return::new(ret_val)))
     }
 }
 
@@ -1481,6 +1501,31 @@ mod tests {
         assert!(
             Construct::method_call(".method()").is_err(),
             "Missing caller"
+        );
+    }
+
+    #[test]
+    fn t_return_valid() {
+        assert!(
+            Construct::return_expression("return").is_ok(),
+            "Empty return is valid"
+        );
+        assert!(
+            Construct::return_expression("return 1").is_ok(),
+            "Returning a constant is allowed"
+        );
+    }
+
+    #[test]
+    fn t_return_invalid() {
+        assert!(
+            Construct::return_expression("return 1 2").is_err(),
+            "Returning multiple values is not allowed"
+        );
+
+        assert!(
+            Construct::return_expression("return return").is_err(),
+            "Returning a return is not allowed"
         );
     }
 }
