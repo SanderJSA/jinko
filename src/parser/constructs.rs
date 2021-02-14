@@ -766,11 +766,15 @@ impl Construct {
         let (input, _) = Token::maybe_consume_extra(input)?;
         // println!("After white space -> {}", input);
 
+        if input.starts_with("return") {
+            // The return value is 'return'. 'return' is a valid instruction but in our case the
+            // input is 'return return' which is not allowed
+            return Err(nom::Err::Error((input, nom::error::ErrorKind::Tag)));
+        }
+
         let (input, ret_val) = opt(Construct::instruction)(input)?;
-        let (input, _) = Token::maybe_consume_extra(input)?;
-        println!("Input is \"{}\"", input);
-        if input != "" {
-            // There is still something
+        if Construct::instruction(input).is_ok() {
+            // There is still something, so we are trying to return 2 values, which is impossible
             return Err(nom::Err::Error((input, nom::error::ErrorKind::NonEmpty)));
         }
 
