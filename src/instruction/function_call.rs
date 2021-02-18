@@ -147,7 +147,7 @@ impl Instruction for FunctionCall {
             }
         };
 
-        let ret_val = function.run(interpreter);
+        let ret_val = function.run(&self, interpreter);
 
         interpreter.scope_exit();
 

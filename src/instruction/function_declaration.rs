@@ -2,7 +2,7 @@
 //! a name, a list of required arguments as well as an associated code block
 
 use crate::instance::Ty;
-use crate::instruction::{Block, DecArg, InstrKind, Instruction};
+use crate::instruction::{Block, DecArg, FunctionCall, InstrKind, Instruction};
 use crate::{Interpreter, JkErrKind, JkError, Rename};
 
 /// What "kind" of function is defined. There are four types of functions in jinko,
@@ -109,21 +109,15 @@ impl FunctionDec {
 
     /// Run through the function as if it was called. This is useful for setting
     /// an entry point into the interpreter and executing it
-    pub fn run(&self, interpreter: &mut Interpreter) -> Result<InstrKind, JkError> {
+    pub fn run(
+        &self,
+        call: &FunctionCall,
+        interpreter: &mut Interpreter,
+    ) -> Result<InstrKind, JkError> {
         let block = match self.block() {
             Some(b) => b,
             // FIXME: Fix Location and input
-            None => {
-                return Err(JkError::new(
-                    JkErrKind::Interpreter,
-                    format!(
-                        "cannot execute function {} as it is marked `ext`",
-                        self.name()
-                    ),
-                    None,
-                    self.name().to_owned(),
-                ))
-            }
+            None => return crate::ffi::JkFfi::execute(call, interpreter),
         };
 
         block.execute(interpreter)
