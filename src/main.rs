@@ -1,6 +1,7 @@
 #[warn(missing_docs)]
 mod args;
 mod error;
+mod ffi;
 mod instance;
 mod instruction;
 mod interpreter;
