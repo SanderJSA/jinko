@@ -48,6 +48,9 @@ pub struct Interpreter {
 
     /// Sources included by the interpreter
     included: HashSet<PathBuf>,
+
+    /// External libraries to use via FFI
+    external_libs: Vec<libloading::Library>,
 }
 
 impl Interpreter {
@@ -70,6 +73,7 @@ impl Interpreter {
             scope_map: ScopeMap::new(),
             tests: HashMap::new(),
             included: HashSet::new(),
+            external_libs: Vec::new(),
         };
 
         i.scope_enter();
@@ -220,6 +224,16 @@ impl Interpreter {
     /// Check if a source is included or not
     pub fn is_included(&self, source: &PathBuf) -> bool {
         self.included.contains(source)
+    }
+
+    /// Add a library to the interpreter
+    pub fn add_lib(&mut self, lib: libloading::Library) {
+        self.external_libs.push(lib)
+    }
+
+    /// Get a reference on all shared libraries loaded in the interpreter
+    pub fn libs(&self) -> &Vec<libloading::Library> {
+        &self.external_libs
     }
 }
 

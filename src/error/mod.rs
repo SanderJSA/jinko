@@ -9,6 +9,7 @@ use colored::Colorize;
 pub enum JkErrKind {
     Parsing,
     Interpreter,
+    ExternFunc,
     IO,
 }
 
@@ -93,5 +94,11 @@ impl std::convert::From<std::io::Error> for JkError {
 impl std::convert::From<nom::Err<(&str, nom::error::ErrorKind)>> for JkError {
     fn from(e: nom::Err<(&str, nom::error::ErrorKind)>) -> Self {
         JkError::new(JkErrKind::Parsing, e.to_string(), None, "".to_owned())
+    }
+}
+
+impl std::convert::From<libloading::Error> for JkError {
+    fn from(e: libloading::Error) -> Self {
+        JkError::new(JkErrKind::ExternFunc, e.to_string(), None, e.to_string())
     }
 }
