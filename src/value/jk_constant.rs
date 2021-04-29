@@ -1,3 +1,4 @@
+use super::string_interpolation::JkStringFmt;
 use crate::instruction::{InstrKind, Instruction, Operator, TypeDec};
 use crate::{
     FromObjectInstance, Interpreter, JkError, JkString, ObjectInstance, Rename, ToObjectInstance,
@@ -219,7 +220,9 @@ impl Instruction for JkString {
     fn execute(&self, interpreter: &mut Interpreter) -> Result<InstrKind, JkError> {
         interpreter.debug("CONSTANT", &self.0.to_string());
 
-        Ok(InstrKind::Expression(Some(self.to_instance())))
+        let interpolated = JkString::from(JkStringFmt::interpolate(&self.0, interpreter)?);
+
+        Ok(InstrKind::Expression(Some(interpolated.to_instance())))
     }
 }
 
