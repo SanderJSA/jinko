@@ -16,6 +16,9 @@ pub struct Args {
     #[structopt(short, long)]
     debug: bool,
 
+    #[structopt(long = "no-std-lib", help = "Do not include jinko's standard library")]
+    no_std_lib: bool,
+
     #[structopt(parse(from_os_str))]
     input: Option<PathBuf>,
 }
@@ -47,6 +50,11 @@ impl Args {
     /// Is the interpreter launched in debug mode
     pub fn debug(&self) -> bool {
         self.debug
+    }
+
+    /// Should the interpreter refrain from including the standard lbirary
+    pub fn no_std_lib(&self) -> bool {
+        self.no_std_lib
     }
 
     /// File input given to the interpreter

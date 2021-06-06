@@ -79,14 +79,16 @@ impl Interpreter {
             .iter()
             .for_each(|ty_name| i.add_type(TypeDec::from(*ty_name)).unwrap());
 
-        // Include the standard library
+        i
+    }
+
+    /// Include the standard library in the current interpreter
+    pub fn incl_stdlib(&mut self) {
         let stdlib_incl =
             crate::instruction::Incl::new(String::from("stdlib"), Some(String::from("")));
         stdlib_incl
-            .execute(&mut i)
+            .execute(self)
             .expect("cannot include jinko's standard library - aborting");
-
-        i
     }
 
     /// Get a rerference to an interpreter's source path

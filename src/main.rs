@@ -65,7 +65,11 @@ fn main() {
     let mut interpreter = Parser::parse(&input).unwrap();
 
     interpreter.set_path(Some(path.to_owned()));
+    // FIXME: This is the same as in repl.rs, refactor it
     interpreter.set_debug(args.debug());
+    if !args.no_std_lib() {
+        interpreter.incl_stdlib();
+    }
 
     // The entry point always has a block
     let ep = interpreter.entry_point.block().unwrap().clone();

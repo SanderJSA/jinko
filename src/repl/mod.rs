@@ -57,6 +57,9 @@ impl Repl {
 
         let mut interpreter = Interpreter::new();
         interpreter.set_debug(args.debug());
+        if !args.no_std_lib() {
+            interpreter.incl_stdlib()
+        }
 
         // FIXME: Add actual prompt
         line_reader.set_prompt(&Prompt::get(&interpreter))?;
