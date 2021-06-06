@@ -1,0 +1,24 @@
+// FIXME: Once generics are implemented, implement the Option<T> type
+
+type Option_int(is_full: bool, value: int);
+
+func some(value: int) -> Option_int {
+    Option_int { is_full =  true, value = value }
+}
+
+func none() -> Option_int {
+    Option_int { is_full =  false, value = 0 }
+}
+
+func is_some(opt: Option_int) -> bool {
+    opt.is_full
+}
+
+func is_none(opt: Option_int) -> bool {
+    // FIXME: Once ! is implemented, simply return !opt.is_full
+    if opt.is_full {
+        false
+    } else {
+        true
+    }
+}
