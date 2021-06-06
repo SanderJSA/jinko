@@ -1,0 +1,23 @@
+// FIXME: Once generics are implemented, implement the Iter<T> type
+
+// FIXME: This should probably use a range
+type Iter_int(s: int, e: int, current: int);
+
+// FIXME: Likewise
+func range(s: int, e: int) -> Iter_int {
+    Iter_int { s = s, e = e, current = s }
+}
+
+func next(iter: Iter_int) -> Option_int {
+    iter.current = iter.current + 1;
+    // FIXME: Implement once comparison operators are implemented
+    // if iter.current > iter.end {
+    //     none()
+    // } else {
+    //     some(iter.current - 1)
+    // }
+    // FIXME: Remove once comparison operators are implemented
+    some(iter.current - 1)
+}
+
+@dump()
