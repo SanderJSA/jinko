@@ -4,7 +4,6 @@
 //! or it's not.
 
 use crate::instruction::TypeDec;
-use crate::type_cache;
 use crate::typechecker::CheckedType;
 use crate::{Context, ErrKind, Error, InstrKind, Instruction, JkBool, ObjectInstance, TypeCheck};
 
@@ -122,13 +121,12 @@ impl Instruction for Var {
 }
 
 impl TypeCheck for Var {
-    type_cache!(ty);
-
-    fn resolve_type(&self, ctx: &mut Context) -> CheckedType {
+    fn resolve_type(&self, _ctx: &mut Context) -> CheckedType {
+        // FIXME: Is this correct? Does no type correspond to void? Can we use
+        // CheckedType for the Instances?
         match self.instance.ty() {
             None => CheckedType::Void,
-            // FIXME: Remove the clone?
-            Some(ty) => CheckedType::Resolved(ty.clone()),
+            Some(ty) => CheckedType::Resolved(ty.into()),
         }
     }
 }
