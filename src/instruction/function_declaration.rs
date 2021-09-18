@@ -1,7 +1,7 @@
 //! Function Declarations are used when adding a new function to the source. They contain
 //! a name, a list of required arguments as well as an associated code block
 
-use crate::instruction::{Block, DecArg, InstrKind, Instruction, TypeId};
+use crate::instruction::{Block, DecArg, InstrKind, Instruction, TypeId, Var};
 use crate::typechecker::CheckedType;
 use crate::{Context, ErrKind, Error, ObjectInstance, TypeCheck};
 
@@ -124,6 +124,17 @@ impl FunctionDec {
 
         block.execute(ctx)
     }
+
+    fn type_args(&self, ctx: &mut Context) {
+        for arg in &self.args {
+            ctx.debug("TYPE ARG", &format!("mapping arg: {}", arg));
+            // FIXME: This is disgusting
+            let mut arg_var = Var::new(arg.name().to_owned());
+            arg_var.set_type(arg.get_type().id().into());
+            // FIXME: No unwrap, no adding the variable?
+            ctx.add_variable(arg_var).unwrap();
+        }
+    }
 }
 
 impl Instruction for FunctionDec {
@@ -200,6 +211,7 @@ impl TypeCheck for FunctionDec {
 
         match &self.block {
             Some(b) => {
+                self.type_args(ctx);
                 let block_ty = b.resolve_type(ctx);
 
                 if block_ty != expected_ty {
